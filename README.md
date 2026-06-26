@@ -14,8 +14,8 @@ Everything runs directly from a single `.exe`, saves progress to `save.txt`, and
 
 ## Features
 
-- **Open world** — move freely in 2D coordinates (X, Y)
-- **Hunger system** — 0–20 scale, every step costs food
+- **Open world** — move freely in 2D (and 3D on HAR3D) coordinates (X, Y)
+- **Hunger system** — 0–40 scale, every step costs food
 - **Monster encounters** — random fights that block your path
 - **Inventory** — collect and use food at any time
 - **Save/Load** — progress persists in `save.txt`
@@ -39,7 +39,7 @@ Everything runs directly from a single `.exe`, saves progress to `save.txt`, and
 
 ##  Installation
 
-1. Download the latest `HAR.exe` from [Releases](https://github.com/Armsoup/HAR_RPG/releases)
+1. Download the latest `HAR.exe` and `HAR3D.exe` from [Releases](https://github.com/Armsoup/HAR_RPG/releases)
 2. Run the `.exe`
 3. Enter your name and start surviving
 
@@ -57,10 +57,13 @@ Project structure:
 
 · HAR.cpp — game logic and main loop
 
+· HAR3D.cpp — game logic and main loop on 3D
+
 To build with MSVC (x64 Native Tools Command Prompt):
 
 ```
 cl /EHsc /Fe:HAR.exe HAR.cpp
+cl /EHsc /Fe:HAR3D.exe HAR3D.cpp
 ```
 
 The engine is designed to be reusable — you can drop it into any console project and get instant file/save/color support.
