@@ -15,32 +15,159 @@ namespace fs = filesystem;
 
 // GLOBAL VARIABLES 
 string PlayerName;
-int PlayerFood = 20;
+int PlayerFood = 40;
 int PlayerFoodInventory = 0;
-int PlayerX = 0; // Position left/right
-int PlayerY = 0; // Position Forward/backward
+float PlayerX = 0; // Position left/right
+float PlayerY = 0; // Position Forward/backward
 int GlobalEvent = 0; // 0 - Quietly, 1 - Have you found food, 2 - We met a monster
+int KillMonsters = 0;
+int FoundFood = 0;
+int Distancecovered = 0;
+int achievementskill1 = 0;
+int achievementsfood1 = 0;
+int achievementskill10 = 0;
+int achievementsfood10 = 0;
+int achievementskill100 = 0;
+int achievementsfood100 = 0;
+int achievementsdist10 = 0;
+int achievementsdist100 = 0;
+int achievementsdist1000 = 0;
+int achievementsdist10000 = 0;
+int achievementsdist40075 = 0;
 
 void game() {
 	setColor("1f");
-	if (PlayerFood > 20) { cout << "Cheater, huh?" << endl; pause(); exit(0); }
+	if (Distancecovered == 0) {
+		// Backstory...
+		print_slow("-Hi! I found something...", 75);
+		Sleep(3500);
+		print_slow("-Hi, so what strange thing did you find?", 75);
+		Sleep(3500);
+		print_slow("-It... looks like some kind of creature!", 75);
+		Sleep(3500);
+		print_slow("-Hahaha, I don't believe you, so I'm heading into that forest myself!", 75);
+		pause();
+		clearScreen();
+	}
+	if (PlayerFood > 40) { cout << "Cheater, huh?" << endl; pause(); exit(0); }
 	if (PlayerFood == 0 && PlayerFoodInventory == 0) {
 		setColor("4f");
 		cout << "=========================================" << endl;
-		cout << "  YOU DIED OF HUNGER IN THE FIELD...   " << endl;
+		cout << "  YOU DIED OF HUNGER IN THE FOREST...   " << endl;
 		cout << "=========================================" << endl;
-		cout << "Your final score: " << PlayerX + PlayerY << " steps." << endl;
+		cout << "Your final score: " << Distancecovered << " steps." << endl;
+		cout << "Monsters killed: " << KillMonsters << "." << endl;
+		cout << "Food found: " << FoundFood << "." << endl;
+		cout << "Kilometers covered: " << Distancecovered * 0.5 << endl;
 		pause();
 		exit(0);
 	}
 	cout << "=== PLAYER STATUS ===" << endl;
 	cout << "Coordinates: X: " << PlayerX << ", Y: " << PlayerY << endl;
-	cout << "Your hunger: " << PlayerFood << "/20" << endl;
+	cout << "Your hunger: " << PlayerFood << "/40" << endl;
 	cout << "Food in inventory: " << PlayerFoodInventory << endl;
 	cout << "=====================\n" << endl;
+	if (KillMonsters == 1) {
+		if (achievementskill1 == 0) {
+			achievementskill1 = 1;
+			cout << endl;
+			Achievements("UNLOCKED: Kill the first monster!");
+			cout << "ACHIEVEMENT UNLOCKED: Kill the first monster!" << endl;
+		}
+	}
+	if (KillMonsters == 10) {
+		if (achievementskill10 == 0) {
+			achievementskill10 = 1;
+			cout << endl;
+			Achievements("UNLOCKED: Kill ten monsters!");
+			cout << "ACHIEVEMENT UNLOCKED: Kill ten monsters!" << endl;
+			PlayerFoodInventory = PlayerFoodInventory + 6;
+		}
+	}
+	if (KillMonsters == 100) {
+		if (achievementskill100 == 0) {
+			achievementskill100 = 1;
+			cout << endl;
+			Achievements("UNLOCKED: GOD of monsters! (Kill a hundred monsters!)");
+			cout << "ACHIEVEMENT UNLOCKED: GOD of monsters!" << endl;
+			PlayerFoodInventory = PlayerFoodInventory + 60;
+		}
+	}
+	if (FoundFood == 1) {
+		if (achievementsfood1 == 0) {
+			achievementsfood1 = 1;
+			cout << endl;
+			Achievements("UNLOCKED: Find the first food!");
+			cout << "ACHIEVEMENT UNLOCKED: Find the first food!" << endl;
+		}
+	}
+	if (FoundFood == 10) {
+		if (achievementsfood10 == 0) {
+			achievementsfood10 = 1;
+			cout << endl;
+			Achievements("UNLOCKED: Find ten cans of food!");
+			cout << "ACHIEVEMENT UNLOCKED: Find ten cans of food!" << endl;
+			PlayerFoodInventory = PlayerFoodInventory + 4;
+		}
+	}
+	if (FoundFood == 100) {
+		if (achievementsfood100 == 0) {
+			achievementsfood100 = 1;
+			cout << endl;
+			Achievements("UNLOCKED: GOD of meat and canned goods! (Find 100 cans of food!)");
+			cout << "ACHIEVEMENT UNLOCKED: GOD of meat and canned goods!" << endl;
+			PlayerFoodInventory = PlayerFoodInventory + 65;
+		}
+	}
+	if (Distancecovered == 10 * 2) {
+		if (achievementsdist10 == 0) {
+			achievementsdist10 = 1;
+			cout << endl;
+			Achievements("UNLOCKED: The first 10 kilometers!");
+			cout << "ACHIEVEMENT UNLOCKED: The first 10 kilometers!" << endl;
+		}
+	}
+	if (Distancecovered == 100 * 2) {
+		if (achievementsdist100 == 0) {
+			achievementsdist100 = 1;
+			cout << endl;
+			Achievements("UNLOCKED: The first 100 kilometers!");
+			cout << "ACHIEVEMENT UNLOCKED: The first 100 kilometers!" << endl;
+			PlayerFoodInventory = PlayerFoodInventory + 6;
+		}
+	}
+	if (Distancecovered == 1000 * 2) {
+		if (achievementsdist1000 == 0) {
+			achievementsdist1000 = 1;
+			cout << endl;
+			Achievements("UNLOCKED: The first 1000 kilometers!");
+			cout << "ACHIEVEMENT UNLOCKED: The first 1000 kilometers!" << endl;
+			PlayerFoodInventory = PlayerFoodInventory + 30;
+		}
+	}
+	if (Distancecovered == 10000 * 2) {
+		if (achievementsdist10000 == 0) {
+			achievementsdist10000 = 1;
+			cout << endl;
+			Achievements("UNLOCKED: The first 10000 kilometers!");
+			cout << "ACHIEVEMENT UNLOCKED: The first 10000 kilometers!" << endl;
+			PlayerFoodInventory = PlayerFoodInventory + 100;
+		}
+	}
+	if (Distancecovered == 40075 * 2) {
+		if (achievementsdist40075 == 0) {
+			achievementsdist40075 = 1;
+			cout << endl;
+			Achievements("UNLOCKED: A trip around the world! (Cover 40,075 km)");
+			cout << "ACHIEVEMENT UNLOCKED: A trip around the world!" << endl;
+			PlayerFoodInventory = 200000;
+		}
+	}
+	
 
 	if (GlobalEvent == 1) {
 		cout << "You found canned food! (+1 to inventory)" << endl;
+		FoundFood++;
 		GlobalEvent = 0;
 		saveGame();
 	}
@@ -59,7 +186,7 @@ void game() {
 	cout << "[A] Left" << endl;
 	cout << "[D] Right" << endl;
 
-	if (PlayerFoodInventory > 0 && PlayerFood < 20) cout << "[H] Have a snack" << endl;
+	if (PlayerFoodInventory > 0 && PlayerFood < 40) cout << "[H] Have a snack" << endl;
 	else cout << "[H] Have a snack (LOCKED)" << endl;
 	if (GlobalEvent != 2) cout << "[G] Fight! (LOCKED)" << endl;
 
@@ -81,8 +208,9 @@ void game() {
 		}
 		PlayerY++;
 		PlayerFood--;
+		Distancecovered++;
 
-		int eventRoll = rand() % 5;
+		int eventRoll = rand() % 9;
 		if (eventRoll < 2) {
 			PlayerFoodInventory++;
 			GlobalEvent = 1;
@@ -96,9 +224,10 @@ void game() {
 		if (GlobalEvent == 2) { cout << "You cannot escape from the monster to the left!" << endl; pause(); break; }
 		if (PlayerFood == 0) { cout << "You are hungry!" << endl; pause(); break; }
 		PlayerX--;
+		Distancecovered++;
 		PlayerFood--;
 
-		int eventRoll = rand() % 5;
+		int eventRoll = rand() % 9;
 		if (eventRoll < 2) {
 			PlayerFoodInventory++;
 			GlobalEvent = 1;
@@ -112,9 +241,10 @@ void game() {
 		if (GlobalEvent == 2) { cout << "You cannot escape from the monster to the right!" << endl; pause(); break; }
 		if (PlayerFood == 0) { cout << "You are hungry!" << endl; pause(); break; }
 		PlayerX++;
+		Distancecovered++;
 		PlayerFood--;
 
-		int eventRoll = rand() % 5;
+		int eventRoll = rand() % 9;
 		if (eventRoll < 2) {
 			PlayerFoodInventory++;
 			GlobalEvent = 1;
@@ -136,12 +266,13 @@ void game() {
 		if (PlayerY > 0) {
 			if (PlayerFood == 0) { cout << "You are hungry!" << endl; pause(); break; }
 			PlayerY--;
+			Distancecovered++;
 			PlayerFood--;
 		}
 		break;
 	}
 	case 'h': {
-		if (PlayerFoodInventory > 0 && PlayerFood < 20) {
+		if (PlayerFoodInventory > 0 && PlayerFood < 40) {
 			PlayerFood++;
 			PlayerFoodInventory--;
 			cout << "You had a great snack!" << endl;
@@ -167,10 +298,11 @@ void game() {
 			break;
 		}
 
-		int win = rand() % 5;
+		int win = rand() % 8;
 		if (win == 2 || win == 4) {
 			PlayerFood--;
 			cout << "VICTORY! You defeated the monster! It dropped meat (+5 to inventory)" << endl;
+			KillMonsters++;
 			PlayerFoodInventory += 5;
 			GlobalEvent = 0;
 			saveGame();
