@@ -10,6 +10,7 @@
 #include "ArmsoupHAREngine.hpp"
 
 using namespace std;
+using namespace HEngine;
 
 namespace fs = filesystem;
 
@@ -60,7 +61,59 @@ void game() {
 		cout << "Food found: " << FoundFood << "." << endl;
 		cout << "Kilometers covered: " << Distancecovered * 0.5 << endl;
 		pause();
-		exit(0);
+		string ForestMap3D =
+			"################"
+			"#..............#"
+			"#..###....###..#"
+			"#..#........#..#"
+			"#..#........#..#"
+			"#......##......#"
+			"#......##......#"
+			"#..............#"
+			"#..............#"
+			"#..............#"
+			"#..............#"
+			"#..............#"
+			"#..#........#..#"
+			"#..............#"
+			"#..............#"
+			"################";
+		float PlayerAngle3D = 0.0f;
+		PlayerX = 2.0f;
+		PlayerY = 2.0f;
+		PlayerFood = 0;
+		while (true) { // Endless 3D walking mode
+			if (isKeyPressed('W')) {
+				int hungry = 0;
+				if (hungry == 0) {
+					float nextX = PlayerX + sinf(PlayerAngle3D) * 0.08f;
+					float nextY = PlayerY + cosf(PlayerAngle3D) * 0.08f;
+					if (ForestMap3D[(int)floorf(nextY) * 16 + (int)floorf(nextX)] != '#') {
+						PlayerX = nextX;
+						PlayerY = nextY;
+					}
+					Sleep(40);
+				}
+			}
+
+			if (isKeyPressed('S')) {
+				int hungry = 0;
+				if (hungry == 0) {
+					float nextX = PlayerX - sinf(PlayerAngle3D) * 0.08f;
+					float nextY = PlayerY - cosf(PlayerAngle3D) * 0.08f;
+					if (ForestMap3D[(int)floorf(nextY) * 16 + (int)floorf(nextX)] != '#') {
+						PlayerX = nextX;
+						PlayerY = nextY;
+					}
+					Sleep(40);
+				}
+			}
+			if (isKeyPressed('A')) PlayerAngle3D -= 0.05f;
+			if (isKeyPressed('D')) PlayerAngle3D += 0.05f;
+			if (isKeyPressed('P')) exit(0);
+			render3D_Ultimate(PlayerAngle3D, ForestMap3D, 16, 16);
+			Sleep(15);
+		}
 	}
 	cout << "=== PLAYER STATUS ===" << endl;
 	cout << "Coordinates: X: " << PlayerX << ", Y: " << PlayerY << endl;

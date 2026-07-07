@@ -1,5 +1,9 @@
-﻿#include "ArmsoupHAREngine.hpp"
+﻿// Copyright © Armsoup 2026
+#include "ArmsoupHAREngine.hpp"
 #include <cmath>
+
+using namespace std;
+using namespace HEngine;
 
 string PlayerName = "Player";
 int PlayerFood = 40;
@@ -93,7 +97,6 @@ void startCombat() {
 int main() {
 	srand(static_cast<unsigned int>(time(0)));
 
-	SetConsoleWidthHeight(120, 45);
 	setColor("1f");
 
 	if (fileExists("save.txt")) {
