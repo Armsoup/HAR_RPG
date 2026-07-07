@@ -2,14 +2,19 @@
 #pragma once
 #define _CRT_SECURE_NO_WARNINGS
 #define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
 #include <windows.h>
 #include <timeapi.h>
 #include <iostream>
 #include <fstream>
+#include <algorithm>
 #include <sstream>
 #include <conio.h>
 #include <filesystem>
 #pragma comment(lib, "winmm.lib")
+
+#undef min
+#undef max
 
 namespace fs = std::filesystem;
 
@@ -256,14 +261,28 @@ namespace HEngine {
 				int checkX = (int)floorf(PlayerX + fVx * d);
 				int checkY = (int)floorf(PlayerY + fVy * d);
 
-				if (checkX >= 0 && checkX < mapWidth && checkY >= 0 && checkY < mapHeight) {
-					if (mapData[checkY * mapWidth + checkX] == '#') {
-						distanceToWall = d;
-						if (d <= 3.5f)      wallChar = '#';
-						else if (d <= 7.5f) wallChar = 'X';
-						else                wallChar = '.';
-						break;
+				if (mapData[checkY * mapWidth + checkX] == '#') {
+					distanceToWall = d;
+					float hitX = PlayerX + fVx * d;
+					float hitY = PlayerY + fVy * d;
+					float blockX = hitX - floorf(hitX);
+					float blockY = hitY - floorf(hitY);
+					float distX = std::min(blockX, 1.0f - blockX);
+					float distY = std::min(blockY, 1.0f - blockY);
+					bool isVerticalWall = (distX < distY);
+					if (d <= 3.5f) {
+						wallChar = isVerticalWall ? 'X' : '#';
 					}
+					else if (d <= 7.5f) {
+						wallChar = isVerticalWall ? '.' : 'X';
+					}
+					else if (d <= 9.5f) {
+						wallChar = isVerticalWall ? '.' : '.';
+					}
+					else {
+						wallChar = isVerticalWall ? ' ' : '.';
+					}
+					break;
 				}
 			}
 
