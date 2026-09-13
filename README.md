@@ -9,6 +9,7 @@ The project is split into two parts:
 - **HAR_RPG** — the game itself (player, hunger, monsters, inventory, open world)
 
 Everything runs directly from a single `.exe`, saves progress to `save.txt`, and fits in under 100 KB.
+> **Starting with [version HAR 6.3](https://github.com/Armsoup/HAR_RPG/releases/tag/RPG_GAME6.3), the compilation and building of .exe and .cpp files are performed in the "VisualStudio 2022 Community" environment.**
 
 ---
 
