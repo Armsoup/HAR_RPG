@@ -7,20 +7,20 @@
 #include <sstream>
 #include <conio.h>
 #include <filesystem>
-#include "ArmsoupHAREngine.hpp"
+#include "ArmsoupHAREngine.cpp"
 
 using namespace std;
 using namespace HEngine;
-
-namespace fs = filesystem;
 
 // GLOBAL VARIABLES 
 string PlayerName;
 int PlayerFood = 40;
 int PlayerFoodInventory = 0;
 float PlayerX = 0; // Position left/right
-float PlayerY = 0; // Position Forward/backward
+float PlayerY = 0; // Position Up/down
+float PlayerZ = 0; // Position Forward/backward
 int GlobalEvent = 0; // 0 - Quietly, 1 - Have you found food, 2 - We met a monster
+bool IsAutoPhysics = true;
 int KillMonsters = 0;
 int FoundFood = 0;
 int Distancecovered = 0;
@@ -80,43 +80,63 @@ void game() {
 			"#...............";
 		float PlayerAngle3D = 0.0f;
 		PlayerX = 2.0f;
-		PlayerY = 2.0f;
+		PlayerZ = 2.0f;
 		PlayerFood = 0;
-		while (true) { // Endless 3D walking mode
-			if (IO::isKeyPressed('W')) {
-				int hungry = 0;
-				if (hungry == 0) {
-					float nextX = PlayerX + sinf(PlayerAngle3D) * 0.08f;
-					float nextY = PlayerY + cosf(PlayerAngle3D) * 0.08f;
-					if (ForestMap3D[(int)floorf(nextY) * 16 + (int)floorf(nextX)] == '.' || ForestMap3D[(int)floorf(nextY) * 16 + (int)floorf(nextX)] == '\0') {
-						PlayerX = nextX;
-						PlayerY = nextY;
+		try {
+			while (true) { // Endless 3D walking mode
+
+				if (IO::isKeyPressed('W')) {
+					int hungry = 0;
+					if (hungry == 0) {
+						float nextX = PlayerX + sinf(PlayerAngle3D) * 0.08f;
+						float nextZ = PlayerZ + cosf(PlayerAngle3D) * 0.08f;
+						if (Physics::check_collission(ForestMap3D, nextX, nextZ)) {
+							PlayerX = nextX;
+							PlayerZ = nextZ;
+						}
+						Sleep(40);
 					}
-					Sleep(40);
 				}
+
+				if (IO::isKeyPressed('S')) {
+					int hungry = 0;
+					if (hungry == 0) {
+						float nextX = PlayerX - sinf(PlayerAngle3D) * 0.08f;
+						float nextZ = PlayerZ - cosf(PlayerAngle3D) * 0.08f;
+						if (Physics::check_collission(ForestMap3D, nextX, nextZ)) {
+							PlayerX = nextX;
+							PlayerZ = nextZ;
+						}
+						Sleep(40);
+					}
+				}
+				if (IO::isKeyPressed('A')) { PlayerAngle3D -= 0.05f; Sleep(15); }
+				if (IO::isKeyPressed('D')) { PlayerAngle3D += 0.05f; Sleep(15); }
+				if (IO::isKeyPressed('P')) exit(0);
+				Vector3D::render3D_Ultimate(PlayerAngle3D, ForestMap3D, 16, 16);
+				Sleep(1);
 			}
 
-			if (IO::isKeyPressed('S')) {
-				int hungry = 0;
-				if (hungry == 0) {
-					float nextX = PlayerX - sinf(PlayerAngle3D) * 0.08f;
-					float nextY = PlayerY - cosf(PlayerAngle3D) * 0.08f;
-					if (ForestMap3D[(int)floorf(nextY) * 16 + (int)floorf(nextX)] == '.' || ForestMap3D[(int)floorf(nextY) * 16 + (int)floorf(nextX)] == '\0') {
-						PlayerX = nextX;
-						PlayerY = nextY;
-					}
-					Sleep(40);
-				}
-			}
-			if (IO::isKeyPressed('A')) PlayerAngle3D -= 0.05f;
-			if (IO::isKeyPressed('D')) PlayerAngle3D += 0.05f;
-			if (IO::isKeyPressed('P')) exit(0);
-			Vector3D::render3D_Ultimate(PlayerAngle3D, ForestMap3D, 16, 16);
-			Sleep(15);
+		}
+		catch (...) {
+			Vector3D::returnBuffer();
+			DWORD error = GetLastError();
+			stringstream ss;
+			ss << "\n========================================================================" << endl;
+			ss << "                                HAR BETA V6.3" << endl;
+			ss << "The game was terminated unexpectedly due to an issue: " << strerror(errno) << endl;
+			ss << "Windows error: " << error << endl;
+			ss << "If you see \"0\" and \"No error\" instead of an error message," << endl;
+			ss << "you may have gone too far," << endl;
+			ss << "causing Windows to throw an ACCESS_VIOLATION exception!" << endl;
+			ss << "Coordinates: X=" << PlayerX << ", Z=" << PlayerZ << endl;
+			ss << "You literally walked into unallocated memory!" << endl;
+			ss << "========================================================================\n" << endl;
+			IO::ErrorGame(ss.str(), "Armsoup", 1);
 		}
 	}
 	cout << "=== PLAYER STATUS ===" << endl;
-	cout << "Coordinates: X: " << PlayerX << ", Y: " << PlayerY << endl;
+	cout << "Coordinates: X: " << PlayerX << ", Z: " << PlayerZ << endl;
 	cout << "Your hunger: " << PlayerFood << "/40" << endl;
 	cout << "Food in inventory: " << PlayerFoodInventory << endl;
 	cout << "=====================\n" << endl;
@@ -216,7 +236,7 @@ void game() {
 			PlayerFoodInventory = 200000;
 		}
 	}
-	
+
 
 	if (GlobalEvent == 1) {
 		cout << "You found canned food! (+1 to inventory)" << endl;
@@ -234,7 +254,7 @@ void game() {
 
 	cout << "\nControls:" << endl;
 	cout << "[W] Forward" << endl;
-	if (PlayerY > 0) cout << "[S] Backward" << endl;
+	if (PlayerZ > 0) cout << "[S] Backward" << endl;
 	else cout << "[S] Backward (LOCKED)" << endl;
 	cout << "[A] Left" << endl;
 	cout << "[D] Right" << endl;
@@ -259,11 +279,11 @@ void game() {
 			IO::pause();
 			break;
 		}
-		PlayerY++;
+		PlayerZ++;
 		PlayerFood--;
 		Distancecovered++;
 
-		int eventRoll = rand() % 9;
+		int eventRoll = System::getrand(1, 8);
 		if (eventRoll < 2) {
 			PlayerFoodInventory++;
 			GlobalEvent = 1;
@@ -280,7 +300,7 @@ void game() {
 		Distancecovered++;
 		PlayerFood--;
 
-		int eventRoll = rand() % 9;
+		int eventRoll = System::getrand(1, 8);
 		if (eventRoll < 2) {
 			PlayerFoodInventory++;
 			GlobalEvent = 1;
@@ -297,7 +317,7 @@ void game() {
 		Distancecovered++;
 		PlayerFood--;
 
-		int eventRoll = rand() % 9;
+		int eventRoll = System::getrand(1, 8);
 		if (eventRoll < 2) {
 			PlayerFoodInventory++;
 			GlobalEvent = 1;
@@ -310,15 +330,15 @@ void game() {
 	case 's': {
 		if (GlobalEvent == 2) {
 			GlobalEvent = 0;
-			PlayerY--;
+			PlayerZ--;
 			cout << "You cowardly ran away from the monster backward!" << endl;
 			SLgame::saveGame();
 			IO::pause();
 			break;
 		}
-		if (PlayerY > 0) {
+		if (PlayerZ > 0) {
 			if (PlayerFood == 0) { cout << "You are hungry!" << endl; IO::pause(); break; }
-			PlayerY--;
+			PlayerZ--;
 			Distancecovered++;
 			PlayerFood--;
 		}
@@ -351,7 +371,7 @@ void game() {
 			break;
 		}
 
-		int win = rand() % 8;
+		int win = System::getrand(1, 7);
 		if (win == 2 || win == 4) {
 			PlayerFood--;
 			cout << "VICTORY! You defeated the monster! It dropped meat (+5 to inventory)" << endl;
@@ -371,53 +391,80 @@ void game() {
 }
 
 int main() {
+	timeBeginPeriod(1);
 	srand(static_cast<unsigned int>(time(0)));
 
-	if (Filesystem::fileExists("save.txt")) {
-		cout << "Old save file detected! Continue the game? [Y/N]" << endl;
-		char loadChoice = _getch();
-		loadChoice = tolower(loadChoice);
-		cout << endl;
+	try {
+		if (Filesystem::fileExists("save.txt")) {
+			cout << "Old save file detected! Continue the game? [Y/N]" << endl;
+			char loadChoice = _getch();
+			loadChoice = tolower(loadChoice);
+			cout << endl;
 
-		if (loadChoice == 'y') {
-			SLgame::loadGame();
-			cout << "Game successfully loaded! Welcome back, " << PlayerName << "!" << endl;
-			Sleep(2000);
+			if (loadChoice == 'y') {
+				if (SLgame::loadGame()) {
+					cout << "Game successfully loaded! Welcome back, " << PlayerName << "!" << endl;
+					Sleep(2000);
+				}
+				else {
+					cout << "ERROR: load game error :(" << endl;
+					IO::pause();
+					cout << "Exit..." << endl;
+					Sleep(2000);
+					exit(0);
+				}
 
-			while (true) {
-				IO::clearScreen();
-				game();
+				while (true) {
+					IO::clearScreen();
+					game();
+				}
+				return 0;
 			}
-			return 0;
+		}
+
+		cout << "Hello, player, enter your name to begin" << endl;
+		getline(cin, PlayerName);
+		PlayerName = System::trim(PlayerName);
+		cout << "\nGreat, " << PlayerName << ", start the game?" << endl;
+		char choice = _getch();
+		choice = tolower(choice);
+		switch (choice) {
+		case 'y': {
+			IO::clearScreen();
+			cout << "Starting!" << endl;
+			Sleep(2000);
+			break;
+		}
+		case 'n': {
+			exit(0);
+		}
+		default: {
+			IO::clearScreen();
+			cout << "Starting!" << endl;
+			Sleep(2000);
+			break;
+		}
+		}
+		while (true) {
+			IO::clearScreen();
+			game();
 		}
 	}
-
-	cout << "Hello, player, enter your name to begin" << endl;
-	getline(cin, PlayerName);
-	PlayerName = System::trim(PlayerName);
-	cout << "\nGreat, " << PlayerName << ", start the game?" << endl;
-	char choice = _getch();
-	choice = tolower(choice);
-	switch (choice) {
-	case 'y': {
-		IO::clearScreen();
-		cout << "Starting!" << endl;
-		Sleep(2000);
-		break;
-	}
-	case 'n': {
-		exit(0);
-	}
-	default: {
-		IO::clearScreen();
-		cout << "Starting!" << endl;
-		Sleep(2000);
-		break;
-	}
-	}
-	while (true) {
-		IO::clearScreen();
-		game();
+	catch (...) {
+		Vector3D::returnBuffer();
+		DWORD error = GetLastError();
+		stringstream ss;
+		ss << "\n========================================================================" << endl;
+		ss << "                                HAR BETA V6.3" << endl;
+		ss << "The game was terminated unexpectedly due to an issue: " << strerror(errno) << endl;
+		ss << "Windows error: " << error << endl;
+		ss << "If you see \"0\" and \"No error\" instead of an error message," << endl;
+		ss << "you may have gone too far," << endl;
+		ss << "causing Windows to throw an ACCESS_VIOLATION exception!" << endl;
+		ss << "Coordinates: X=" << PlayerX << ", Z=" << PlayerZ << endl;
+		ss << "You literally walked into unallocated memory!" << endl;
+		ss << "========================================================================\n" << endl;
+		IO::ErrorGame(ss.str(), "Armsoup", 1);
 	}
 	return 0;
 }
