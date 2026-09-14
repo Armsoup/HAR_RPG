@@ -15,7 +15,7 @@ Everything runs directly from a single `.exe`, saves progress to `save.txt`, and
 
 ## Features
 
-- **Open world** — move freely in 2D (and 3D on HAR3D) coordinates (X, Y)
+- **Open world** — move freely in 2D (and 3D on HAR3D) coordinates (X, Y, Z)
 - **Hunger system** — 0–40 scale, every step costs food
 - **Monster encounters** — random fights that block your path
 - **Inventory** — collect and use food at any time
@@ -54,7 +54,7 @@ The engine and game are fully open-source under AGPL-3.0.
 
 Project structure:
 
-· ArmsoupHAREngine.hpp — engine implementation
+· ArmsoupHAREngine.cpp — engine implementation
 
 · HAR.cpp — game logic and main loop
 
